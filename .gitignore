@@ -1,0 +1,12 @@
+# Virtual Env
+env/
+__pycache__/
+*.pyc
+
+# SQLite Database
+*.db
+
+# generated files by IDE
+.vscode/
+.DS_Store
+
