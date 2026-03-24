@@ -1,4 +1,5 @@
 from sqlalchemy.orm import Session
+from sqlalchemy.exc import SQLAlchemyError
 import models
 import schemas
 
@@ -18,21 +19,27 @@ def get_task(db: Session, task_id: int):
 def get_tasks(db: Session, skip: int = 0, limit: int = 100):
     # Currently returns all tasks without pagination
     # NOTE: skip and limit are defined but not used (can be improved)
-    return db.query(models.Task).all()
+    return db.query(models.Task).offset(skip).limit(limit).all()
 
 
 # ---------------------------------------------------------
 # FUNCTION: Create a new task and store it in the database
 # ---------------------------------------------------------
 def create_task(db: Session, task: schemas.TaskCreate):
-    # Create a new Task object using data validated by Pydantic (schemas)
-    db_task = models.Task(
-        title=task.title,
-        description=task.description,
-        deadline=task.deadline,
-        # task.status is an Enum → we convert it to string using .value
-        status=task.status.value
-    )
+    try:
+        db_task = models.Task(
+            title=task.title,
+            description=task.description,
+            deadline=task.deadline,
+            status=task.status.value
+        )
+        db.add(db_task)
+        db.commit()
+        db.refresh(db_task)
+        return db_task
+    except SQLAlchemyError:
+        db.rollback()
+        raise
 
     # Add the new task to the database session (not yet saved)
     db.add(db_task)

@@ -143,13 +143,14 @@ def root():
 # FRONTEND INTEGRATION (STATIC FILES + TEMPLATES)
 # ---------------------------------------------------------
 
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+FRONTEND_DIR = os.path.join(BASE_DIR, "..", "frontend")
 # Mount static files (CSS, JS)
 # This makes files accessible at: /static/...
-app.mount("/static", StaticFiles(directory="../frontend/static"), name="static")
+app.mount("/static", StaticFiles(directory=os.path.join(FRONTEND_DIR, "static")), name="static")
 
 # Configure templates directory (HTML files)
-templates = Jinja2Templates(directory="../frontend/templates")
-
+templates = Jinja2Templates(directory=os.path.join(FRONTEND_DIR, "templates"))
 
 # ---------------------------------------------------------
 # ROUTE: SERVE FRONTEND UI
